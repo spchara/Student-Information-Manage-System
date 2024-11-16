@@ -23,7 +23,11 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'course',
-                'constraints': [models.CheckConstraint(condition=models.Q(('Ccredit__range', (1, 10))), name='course_chk_1'), models.CheckConstraint(condition=models.Q(('Cpno__isnull', True), models.Q(('Cpno', models.F('Cno')), _negated=True), _connector='OR'), name='course_chk_2')],
+                'constraints': [
+                    models.CheckConstraint(check=models.Q(Ccredit__range=(1, 10)), name='course_chk_1'),
+                    models.CheckConstraint(check=(models.Q(Cpno__isnull=True) | ~models.Q(Cpno=models.F('Cno'))),
+                                           name='course_chk_2')
+                ],
             },
         ),
         migrations.CreateModel(
@@ -37,7 +41,10 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'student',
-                'constraints': [models.CheckConstraint(condition=models.Q(('Sage__gt', 0)), name='student_chk_1'), models.CheckConstraint(condition=models.Q(('Ssex__in', ['男', '女'])), name='student_chk_2')],
+                'constraints': [
+                    models.CheckConstraint(check=models.Q(Sage__gt=0), name='student_chk_1'),
+                    models.CheckConstraint(check=models.Q(Ssex__in=['男', '女']), name='student_chk_2')
+                ],
             },
         ),
         migrations.CreateModel(
@@ -50,8 +57,11 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'sc',
-                'constraints': [models.CheckConstraint(condition=models.Q(('Grade__gte', 0), ('Grade__lte', 100)), name='sc_chk_1'), models.UniqueConstraint(fields=('Sno', 'Cno'), name='uc_student_course')],
+                'constraints': [
+                    models.CheckConstraint(check=models.Q(Grade__gte=0, Grade__lte=100), name='sc_chk_1'),
+                    models.UniqueConstraint(fields=['Sno', 'Cno'], name='uc_student_course')
+                ],
                 'unique_together': {('Sno', 'Cno')},
             },
-        ),
+        )
     ]
