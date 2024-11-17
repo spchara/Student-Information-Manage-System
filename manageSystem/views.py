@@ -6,8 +6,7 @@ from manageSystem import models
 
 def index(request):
     return render(request, 'index.html')
-from django.shortcuts import render
-from manageSystem import models
+
 
 def student_table(request):
     message = ''
@@ -73,4 +72,72 @@ def student_table(request):
 def course_table(request):
     message = ''
     courses = models.Course.objects.all()
+
+    if request.method == 'POST':
+        course_id = request.POST.get('course_id', '').strip()
+        course_name = request.POST.get('course_name', '').strip()
+        min_hours = request.POST.get('min_hours', '1').strip()
+        max_hours = request.POST.get('max_hours', '99').strip()
+        min_credit = request.POST.get('min_credit', '0.0').strip()
+        max_credit = request.POST.get('max_credit', '10.0').strip()
+        pre_course_filter = request.POST.get('pre_course_filter', '')
+
+        filters = {}
+        if course_id:
+            filters['Cno__contains'] = course_id
+        if course_name:
+            filters['Cname__contains'] = course_name
+        if min_hours and min_hours != '1':
+            filters['Chours__gte'] = min_hours
+        if max_hours and max_hours != '99':
+            filters['Chours__lte'] = max_hours
+        if min_credit and min_credit != '0.0':
+            filters['Ccredit__gte'] = min_credit
+        if max_credit and max_credit != '10.0':
+            filters['Ccredit__lte'] = max_credit
+        if pre_course_filter == '1':
+            filters['Cpno__isnull'] = False
+        elif pre_course_filter == '2':
+            filters['Cpno__isnull'] = True
+
+        courses = models.Course.objects.filter(**filters)
+        if not courses.exists():
+            message = 'No courses found with the given criteria: '
+            if course_id:
+                message += f'ID contains "{course_id}", '
+            if course_name:
+                message += f'name contains "{course_name}", '
+            if min_hours and min_hours != '1':
+                message += f'hours >= "{min_hours}", '
+            if max_hours and max_hours != '99':
+                message += f'hours <= "{max_hours}", '
+            if min_credit and min_credit != '0.0':
+                message += f'credit >= "{min_credit}", '
+            if max_credit and max_credit != '10.0':
+                message += f'credit <= "{max_credit}", '
+            if pre_course_filter == '1':
+                message += '有先修课程, '
+            elif pre_course_filter == '2':
+                message += '无先修课程, '
+            message = message.rstrip(', ')
+        else:
+            message = f'{courses.count()} courses found with the given criteria: '
+            if course_id:
+                message += f'ID contains "{course_id}", '
+            if course_name:
+                message += f'name contains "{course_name}", '
+            if min_hours and min_hours != '1':
+                message += f'hours >= "{min_hours}", '
+            if max_hours and max_hours != '99':
+                message += f'hours <= "{max_hours}", '
+            if min_credit and min_credit != '0.0':
+                message += f'credit >= "{min_credit}", '
+            if max_credit and max_credit != '10.0':
+                message += f'credit <= "{max_credit}", '
+            if pre_course_filter == '1':
+                message += 'has pre-course, '
+            elif pre_course_filter == '2':
+                message += 'no pre-course, '
+            message = message.rstrip(', ')
+
     return render(request, 'course-table.html', {'courses': courses, 'message': message})

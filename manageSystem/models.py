@@ -62,9 +62,12 @@ class Student(models.Model):
 
 
 class SC(models.Model):
-    Sno = models.ForeignKey('Student', on_delete=models.CASCADE)
-    Cno = models.ForeignKey('Course', on_delete=models.CASCADE)
+    Sno = models.CharField(max_length=11)
+    Cno = models.CharField(max_length=4)
     Grade = models.SmallIntegerField(blank=True, null=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
+
+    student = models.ForeignKey('Student', to_field='Sno', on_delete=models.CASCADE)
+    course = models.ForeignKey('Course', to_field='Cno', on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'sc'
@@ -75,4 +78,4 @@ class SC(models.Model):
         unique_together = (('Sno', 'Cno'),)
 
     def __str__(self):
-        return f'{self.Sno.Sname} - {self.Cno.Cname}'
+        return f'{self.student.Sname} - {self.course.Cname}'
