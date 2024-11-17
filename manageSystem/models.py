@@ -7,13 +7,15 @@ class Course(models.Model):
     Cno = models.CharField(max_length=4, primary_key=True)
     Cname = models.CharField(max_length=40)
     Cpno = models.CharField(max_length=4, blank=True, null=True)
-    Ccredit = models.SmallIntegerField(blank=True, null=True)
+    Ccredit = models.DecimalField(max_digits=3, decimal_places=1, blank=True, null=True)
+    Chours = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(99)], default=48)  # New field
 
     class Meta:
         db_table = 'course'
         constraints = [
-            CheckConstraint(check=Q(Ccredit__range=(1, 10)), name='course_chk_1'),
-            CheckConstraint(check=(Q(Cpno__isnull=True) | ~Q(Cpno=F('Cno'))), name='course_chk_2')
+            CheckConstraint(check=Q(Ccredit__range=(0, 10)), name='course_chk_1'),
+            CheckConstraint(check=(Q(Cpno__isnull=True) | ~Q(Cpno=F('Cno'))), name='course_chk_2'),
+            CheckConstraint(check=Q(Chours__range=(1, 99)), name='course_chk_3')  # New constraint
         ]
 
     def __str__(self):
@@ -23,6 +25,14 @@ class Course(models.Model):
         from django.core.exceptions import ValidationError
         if self.Cpno and self.Cpno == self.Cno:
             raise ValidationError("Cpno 不能与 Cno 相同。")
+
+    def get_cpno_name(self):
+        if self.Cpno:
+            try:
+                return Course.objects.get(Cno=self.Cpno).Cname
+            except Course.DoesNotExist:
+                return ''
+        return ''
 
 
 class Student(models.Model):

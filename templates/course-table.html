@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}学生表查询{% endblock %}
+
+{% block content %}
+    <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">课程信息表</h1>
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item active">course tables</li>
+                </ol>
+            {% if message != '' %}
+                <div class="alert alert-dark" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+                <p>
+
+                  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#advanced-screening" aria-expanded="false" aria-controls="advanced-screening">
+                    高级筛选
+                  </button>
+                </p>
+                <div class="collapse mb-4" id="advanced-screening">
+                    <div class="card card-body mb-4">
+                      <form method="post" action="{% url 'course_table' %}">
+                          {% csrf_token %}
+                          <div class="row">
+                                <div class="col-3">
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text" id="inputGroup-sizing-default">用编号搜素</span>
+                                        <input type="text" class="form-control" name="course_id" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d*">
+                                    </div>
+                                </div>
+                              <div class="col-3">
+                                  <div class="input-group mb-3">
+                                      <span class="input-group-text" id="inputGroup-sizing-default">用课程名称搜素</span>
+                                      <input type="text" class="form-control" name="course_name" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                                  </div>
+                              </div>
+                              <div class="col-2">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" name="min_age" value="19" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d+" required>
+                                        <span class="input-group-text" id="inputGroup-sizing-default">年龄上下限</span>
+                                        <input type="text" class="form-control" name="max_age" value="22" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d+" required>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        年龄必须是整数，且前一个不能大于后一个。
+                                    </div>
+                                    <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        const minAgeInput = document.querySelector('input[name="min_age"]');
+                                        const maxAgeInput = document.querySelector('input[name="max_age"]');
+                                        const form = minAgeInput.closest('form');
+
+                                        form.addEventListener('submit', function (event) {
+                                            const minAge = parseInt(minAgeInput.value, 10);
+                                            const maxAge = parseInt(maxAgeInput.value, 10);
+
+                                            if (isNaN(minAge) || isNaN(maxAge) || minAge > maxAge) {
+                                                event.preventDefault();
+                                                minAgeInput.setCustomValidity('年龄必须是整数，且前一个不能大于后一个。');
+                                                maxAgeInput.setCustomValidity('年龄必须是整数，且前一个不能大于后一个。');
+                                                minAgeInput.reportValidity();
+                                                maxAgeInput.reportValidity();
+                                            } else {
+                                                minAgeInput.setCustomValidity('');
+                                                maxAgeInput.setCustomValidity('');
+                                            }
+                                        });
+                                    });
+                                    </script>
+                              </div>
+                              <div class="col-2">
+                                  <select class="form-select" aria-label="Default select example" name="student_department">
+                                      <option selected value="">专业筛选</option>
+                                      <option value="计算机科学与技术">计算机科学与技术</option>
+                                      <option value="软件工程">软件工程</option>
+                                        <option value="网络工程">网络工程</option>
+                                        <option value="信息安全">信息安全</option>
+                                        <option value="物联网工程">物联网工程</option>
+                                        <option value="数字媒体技术">数字媒体技术</option>
+                                        <option value="智能科学与技术">智能科学与技术</option>
+                                        <option value="数据科学与大数据技术">数据科学与大数据技术</option>
+                                        <option value="网络空间安全">网络空间安全</option>
+                                        <option value="保密技术">保密技术</option>
+                                    </select>
+                              </div>
+                              <div class="col-1">
+                                  <button class="btn btn-primary" type="submit">搜索</button>
+                              </div>
+
+                          </div>
+                      </form>
+
+
+                  </div>
+                </div>
+            <style>
+                #datatablesSimple th:nth-child(1), #datatablesSimple td:nth-child(1) {
+                    width: 10%;
+                }
+                #datatablesSimple th:nth-child(2), #datatablesSimple td:nth-child(2) {
+                    width: 30%;
+                }
+                #datatablesSimple th:nth-child(3), #datatablesSimple td:nth-child(3) {
+                    width: 30%;
+                }
+                #datatablesSimple th:nth-child(4), #datatablesSimple td:nth-child(4) {
+                    width: 15%;
+                }
+                #datatablesSimple th:nth-child(5), #datatablesSimple td:nth-child(5) {
+                    width: 15%;
+                }
+            </style>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        课程信息表
+                    </div>
+                    <div class="card-body">
+                        <table id="datatablesSimple">
+                            <thead>
+                                <tr>
+                                    <th>课程编号</th>
+                                    <th>课程名称</th>
+                                    <th>先修课程</th>
+                                    <th>学分</th>
+                                    <th>课时</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th>课程编号</th>
+                                    <th>课程名称</th>
+                                    <th>先修课程</th>
+                                    <th>学分</th>
+                                    <th>课时</th>
+                                </tr>
+                            </tfoot>
+                            <tbody>
+                                {% for course in courses %}
+                                    <tr>
+                                        <td>{{ course.Cno }}</td>
+                                        <td>{{ course.Cname }}</td>
+                                        <td>{{ course.get_cpno_name }}</td>
+                                        <td>{{ course.Ccredit }}</td>
+                                        <td>{{ course.Chours }} 课时</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+
+{% endblock %}
+
