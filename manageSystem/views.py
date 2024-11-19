@@ -13,6 +13,8 @@ def index(request):
     return render(request, 'index.html')
 
 
+from django.core.paginator import Paginator
+
 def student_table(request):
     message = ''
     students = models.Student.objects.all()
@@ -71,7 +73,11 @@ def student_table(request):
                 message += f'age <= "{age_max}".'
             message = message.rstrip(', ')
 
-    return render(request, 'student-table.html', {'students': students, 'message': message})
+    paginator = Paginator(students, 100)  # Show 10 students per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'student-table.html', {'page_obj': page_obj, 'message': message})
 
 
 def course_table(request):
@@ -404,7 +410,8 @@ def insert(request):
             print("hours:" + course_hours)
             print("credit:" + course_credit)
             print("pre_course_id:" + pre_course_id)
-            if (not pre_course_id.startswith('C') or not pre_course_id[1:].isdigit() or len(pre_course_id) != 4) and pre_course_id:
+            if (not pre_course_id.startswith('C') or not pre_course_id[1:].isdigit() or len(
+                    pre_course_id) != 4) and pre_course_id:
                 message = '先修课程编号不合法'
             else:
                 try:
@@ -413,6 +420,36 @@ def insert(request):
                     print(course_id)
                     models.Course.objects.create(Cno=course_id, Cname=course_name, Chours=int(course_hours),
                                                  Ccredit=float(course_credit), Cpno=pre_course_id)
+                    query_params = urlencode({'table': table, 'status': 'I'})
+                    return HttpResponseRedirect(f"{reverse('insert')}?{query_params}")
+                except Exception as e:
+                    message = str(e)
+
+        else:
+            student_id = request.POST.get('new_student_id', '').strip()
+            course_id = request.POST.get('new_course_id', '').strip()
+            student = models.Student.objects.filter(Sno=student_id).first()
+            course = models.Course.objects.filter(Cno=course_id).first()
+            grade = request.POST.get('new_grade', '')
+            print("student_id:" + student_id)
+            print("course_id:" + course_id)
+            print("grade:" + grade)
+            # 如果这门课有先修，但是学生没有修先修课程，就不能选这门课
+            if course and course.Cpno:
+                pre_course = models.SC.objects.filter(Sno=student_id, Cno=course.Cpno)
+                if not pre_course:
+                    message = '先修课程未修'
+            elif not student:
+                message = '学生不存在'
+            elif not course:
+                message = '课程不存在'
+            elif not grade.isdigit() or not 0 <= int(grade) <= 100:
+                message = '成绩不合法'
+            else:
+                try:
+                    models.SC.objects.create(student=student, course=course,
+                                             Grade=int(grade),
+                                             Cno=course_id, Sno=student_id)
                     query_params = urlencode({'table': table, 'status': 'I'})
                     return HttpResponseRedirect(f"{reverse('insert')}?{query_params}")
                 except Exception as e:

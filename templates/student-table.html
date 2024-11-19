@@ -3,147 +3,174 @@
 {% block title %}学生表查询{% endblock %}
 
 {% block content %}
-    <main>
-            <div class="container-fluid px-4">
-                <h1 class="mt-4">学生表</h1>
-                <ol class="breadcrumb mb-4">
-                    <li class="breadcrumb-item active">student tables</li>
-                </ol>
-            {% if message != '' %}
-                <div class="alert alert-dark" role="alert">
-                    {{ message }}
-                </div>
-            {% endif %}
-                <p>
+<main>
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">学生表</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item active">student tables</li>
+        </ol>
+        {% if message != '' %}
+        {% endif %}
+        <p>
+            <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#advanced-screening" aria-expanded="false" aria-controls="advanced-screening">
+                高级筛选
+            </button>
+        </p>
+        <div class="collapse mb-4" id="advanced-screening">
+            <div class="card card-body mb-4">
+                <form method="post" action="{% url 'student_table' %}">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="inputGroup-sizing-default">用学号搜素</span>
+                                <input type="text" class="form-control" name="student_id" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d*">
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text" id="inputGroup-sizing-default">用姓名搜素</span>
+                                <input type="text" class="form-control" name="student_name" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            <select class="form-select" aria-label="Default select example" name="student_gender">
+                                <option selected value="">性别筛选</option>
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                            </select>
+                        </div>
+                        <div class="col-2">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" name="min_age" value="19" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d+" required>
+                                <span class="input-group-text" id="inputGroup-sizing-default">年龄上下限</span>
+                                <input type="text" class="form-control" name="max_age" value="22" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d+" required>
+                            </div>
+                            <div class="invalid-feedback">
+                                年龄必须是整数，且前一个不能大于后一个。
+                            </div>
+                            <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const minAgeInput = document.querySelector('input[name="min_age"]');
+                                const maxAgeInput = document.querySelector('input[name="max_age"]');
+                                const form = minAgeInput.closest('form');
 
-                  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#advanced-screening" aria-expanded="false" aria-controls="advanced-screening">
-                    高级筛选
-                  </button>
-                </p>
-                <div class="collapse mb-4" id="advanced-screening">
-                    <div class="card card-body mb-4">
-                      <form method="post" action="{% url 'student_table' %}">
-                          {% csrf_token %}
-                          <div class="row">
-                                <div class="col-3">
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text" id="inputGroup-sizing-default">用学号搜素</span>
-                                        <input type="text" class="form-control" name="student_id" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d*">
-                                    </div>
-                                </div>
-                              <div class="col-3">
-                                  <div class="input-group mb-3">
-                                      <span class="input-group-text" id="inputGroup-sizing-default">用姓名搜素</span>
-                                      <input type="text" class="form-control" name="student_name" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
-                                  </div>
-                              </div>
-                              <div class="col-1">
-                                  <select class="form-select" aria-label="Default select example" name="student_gender">
-                                      <option selected value="">性别筛选</option>
-                                      <option value="男">男</option>
-                                      <option value="女">女</option>
-                                  </select>
-                              </div>
-                              <div class="col-2">
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control" name="min_age" value="19" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d+" required>
-                                        <span class="input-group-text" id="inputGroup-sizing-default">年龄上下限</span>
-                                        <input type="text" class="form-control" name="max_age" value="22" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d+" required>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        年龄必须是整数，且前一个不能大于后一个。
-                                    </div>
-                                    <script>
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        const minAgeInput = document.querySelector('input[name="min_age"]');
-                                        const maxAgeInput = document.querySelector('input[name="max_age"]');
-                                        const form = minAgeInput.closest('form');
+                                form.addEventListener('submit', function (event) {
+                                    const minAge = parseInt(minAgeInput.value, 10);
+                                    const maxAge = parseInt(maxAgeInput.value, 10);
 
-                                        form.addEventListener('submit', function (event) {
-                                            const minAge = parseInt(minAgeInput.value, 10);
-                                            const maxAge = parseInt(maxAgeInput.value, 10);
-
-                                            if (isNaN(minAge) || isNaN(maxAge) || minAge > maxAge) {
-                                                event.preventDefault();
-                                                minAgeInput.setCustomValidity('年龄必须是整数，且前一个不能大于后一个。');
-                                                maxAgeInput.setCustomValidity('年龄必须是整数，且前一个不能大于后一个。');
-                                                minAgeInput.reportValidity();
-                                                maxAgeInput.reportValidity();
-                                            } else {
-                                                minAgeInput.setCustomValidity('');
-                                                maxAgeInput.setCustomValidity('');
-                                            }
-                                        });
-                                    });
-                                    </script>
-                              </div>
-                              <div class="col-2">
-                                  <select class="form-select" aria-label="Default select example" name="student_department">
-                                      <option selected value="">专业筛选</option>
-                                      <option value="计算机科学与技术">计算机科学与技术</option>
-                                      <option value="软件工程">软件工程</option>
-                                        <option value="网络工程">网络工程</option>
-                                        <option value="信息安全">信息安全</option>
-                                        <option value="物联网工程">物联网工程</option>
-                                        <option value="数字媒体技术">数字媒体技术</option>
-                                        <option value="智能科学与技术">智能科学与技术</option>
-                                        <option value="数据科学与大数据技术">数据科学与大数据技术</option>
-                                        <option value="网络空间安全">网络空间安全</option>
-                                        <option value="保密技术">保密技术</option>
-                                    </select>
-                              </div>
-                              <div class="col-1">
-                                  <button class="btn btn-primary" type="submit">搜索</button>
-                              </div>
-
-                          </div>
-                      </form>
-
-
-                  </div>
-                </div>
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <i class="fas fa-table me-1"></i>
-                        学生表信息
+                                    if (isNaN(minAge) || isNaN(maxAge) || minAge > maxAge) {
+                                        event.preventDefault();
+                                        minAgeInput.setCustomValidity('年龄必须是整数，且前一个不能大于后一个。');
+                                        maxAgeInput.setCustomValidity('年龄必须是整数，且前一个不能大于后一个。');
+                                        minAgeInput.reportValidity();
+                                        maxAgeInput.reportValidity();
+                                    } else {
+                                        minAgeInput.setCustomValidity('');
+                                        maxAgeInput.setCustomValidity('');
+                                    }
+                                });
+                            });
+                            </script>
+                        </div>
+                        <div class="col-2">
+                            <select class="form-select" aria-label="Default select example" name="student_department">
+                                <option selected value="">专业筛选</option>
+                                <option value="计算机科学与技术">计算机科学与技术</option>
+                                <option value="软件工程">软件工程</option>
+                                <option value="网络工程">网络工程</option>
+                                <option value="信息安全">信息安全</option>
+                                <option value="物联网工程">物联网工程</option>
+                                <option value="数字媒体技术">数字媒体技术</option>
+                                <option value="智能科学与技术">智能科学与技术</option>
+                                <option value="数据科学与大数据技术">数据科学与大数据技术</option>
+                                <option value="网络空间安全">网络空间安全</option>
+                                <option value="保密技术">保密技术</option>
+                            </select>
+                        </div>
+                        <div class="col-1">
+                            <button class="btn btn-primary" type="submit">搜索</button>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <table id="datatablesSimple">
-                            <thead>
-                                <tr>
-                                    <th>学号</th>
-                                    <th>姓名</th>
-                                    <th>性别</th>
-                                    <th>年龄</th>
-                                    <th>专业</th>
-                                </tr>
-                            </thead>
-                            <tfoot>
-                                <tr>
-                                    <th>学号</th>
-                                    <th>姓名</th>
-                                    <th>性别</th>
-                                    <th>年龄</th>
-                                    <th>专业</th>
-                                </tr>
-                            </tfoot>
-                            <tbody>
-                                {% for student in students %}
-                                <tr>
-                                    <td>{{ student.Sno }}</td>
-                                    <td>{{ student.Sname }}</td>
-                                    <td>{{ student.Ssex }}</td>
-                                    <td>{{ student.Sage }}</td>
-                                    <td>{{ student.Sdept }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
+                学生表信息
+            </div>
+            <div class="card-body">
+                <table id="datatablesSimple">
+                    <thead>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>年龄</th>
+                            <th>专业</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>年龄</th>
+                            <th>专业</th>
+                        </tr>
+                    </tfoot>
+                    <tbody>
+                        {% for student in page_obj %}
+                        <tr>
+                            <td>{{ student.Sno }}</td>
+                            <td>{{ student.Sname }}</td>
+                            <td>{{ student.Ssex }}</td>
+                            <td>{{ student.Sage }}</td>
+                            <td>{{ student.Sdept }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="pagination d-flex justify-content-center">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1" aria-label="First">
+                                        <span aria-hidden="true">&laquo; first</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                        <span aria-hidden="true">previous</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                        <span aria-hidden="true">next</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                                        <span aria-hidden="true">last &raquo;</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
                 </div>
             </div>
-        </main>
-
-
+        </div>
+    </div>
+</main>
 {% endblock %}
-```
