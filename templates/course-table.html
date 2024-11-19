@@ -25,12 +25,12 @@
                       <form method="post" action="{% url 'course_table' %}">
                           {% csrf_token %}
                           <div class="row">
-                              <div class="col-3">
-                                    <div class="input-group mb-3">
-                                        <span class="input-group-text" id="inputGroup-sizing-default">用编号搜素</span>
-                                        <input type="text" class="form-control" name="course_id" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d*">
-                                    </div>
-                              </div>
+                            <div class="col-3">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">用编号搜素</span>
+                                    <input type="text" class="form-control" name="course_id" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                                </div>
+                            </div>
                               <div class="col-3">
                                   <div class="input-group mb-3">
                                       <span class="input-group-text" id="inputGroup-sizing-default">用课程名称搜素</span>

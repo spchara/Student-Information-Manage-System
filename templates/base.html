@@ -43,7 +43,7 @@
                 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
                         <div class="nav">
-                            <div class="sb-sidenav-menu-heading">Core</div>
+                            <div class="sb-sidenav-menu-heading">Tabel</div>
                             <a class="nav-link" href="{% url 'student_table' %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Student Tables
@@ -52,11 +52,23 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 Course Tables
                             </a>
-                            <a class="nav-link" href="tables.html">
+                            <a class="nav-link" href="{% url 'sc_table' %}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                                 SC Tables
                             </a>
-
+                            <div class="sb-sidenav-menu-heading">operate</div>
+                            <a class="nav-link" href="{% url 'delete' %}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                                Delete
+                            </a>
+                            <a class="nav-link" href="tables.html">
+                                <div class="sb-nav-link-icon"><i class="fas fas fa-columns"></i></div>
+                                Tables
+                            </a>
+                            <a class="nav-link" href="tables.html">
+                                <div class="sb-nav-link-icon"><i class="fas fas fa-book-open"></i></div>
+                                Tables
+                            </a>
 
                         </div>
                     </div>
@@ -90,5 +102,6 @@
         <script src="/static/assets/demo/chart-bar-demo.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
         <script src="/static/js/datatables-simple-demo.js"></script>
+        {% block script %}{% endblock %}
     </body>
 </html>

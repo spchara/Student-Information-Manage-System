@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}删除记录{% endblock %}
+
+{% block content %}
+    <div class="modal fade" id="selectTableModal" tabindex="-1" aria-labelledby="selectTableModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="selectTableModalLabel">选择要操作的表</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="selectTableForm" href="{% url 'delete' %}" method="get">
+                        <div class="form-group">
+                            <label for="tableSelect">选择表</label>
+                            <select class="form-control mt-3" id="tableSelect" name="table" aria-label="Default select example">
+                                <option value="student">学生表</option>
+                                <option value="course">课程表</option>
+                                <option value="sc">成绩表</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">确认</button>
+                    </form>
+                    <p>注意，本删除方法为级联删除</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <main>
+        <div class="container-fluid px-4">
+            {% if table == "student" %}
+            <h1 class="mt-4">学生表</h1>
+            {% elif table == "course" %}
+            <h1 class="mt-4">课程表</h1>
+            {% elif table == "sc" %}
+            <h1 class="mt-4">成绩表</h1>
+            {% endif %}
+            <ol class="breadcrumb mb-4">
+                {% if table == "student" %}
+                <li class="breadcrumb-item active">student tables</li>
+                {% elif table == "course" %}
+                <li class="breadcrumb-item active">course tables</li>
+                {% elif table == "sc" %}
+                <li class="breadcrumb-item active">sc tables</li>
+                {% endif %}
+
+            </ol>
+            {% if message != '' %}
+                <div class="alert alert-dark" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#selectTableModal">
+                选择要操作的表
+            </button>
+
+
+
+            {% if table == 'student' %}
+                <div class="card mt-4">
+                    <div class="card-header">
+                    查找要删除的记录
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'delete' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-3">
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text" id="inputGroup-sizing-default">用学号搜索</span>
+                                        <input type="text" class="form-control" name="student_id" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d*" id="studentIdInput">
+                                        <input type="hidden" name="table" value="student">
+                                        <input type="hidden" name="delete" value="False">
+                                    </div>
+                                </div>
+                                <div class="col-1">
+                                  <button class="btn btn-primary" type="submit">搜索</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        查找结果
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+
+                                <tr>
+                                    <th>学号</th>
+                                    <th>姓名</th>
+                                    <th>性别</th>
+                                    <th>年龄</th>
+                                    <th>专业</th>
+                                    <th>操作</th>
+                                </tr>
+
+
+                            <tbody>
+
+                            {% if students %}
+                                {% for student in students %}
+                                    <tr>
+                                        <td>{{ student.Sno }}</td>
+                                        <td>{{ student.Sname }}</td>
+                                        <td>{{ student.Ssex }}</td>
+                                        <td>{{ student.Sage }}</td>
+                                        <td>{{ student.Sdept }}</td>
+                                        <td>
+                                            <form method="post" action="{% url 'delete' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="student_id" value="{{ student.Sno }}">
+                                                <input type="hidden" name="table" value="student">
+                                                <input type="hidden" name="delete" value="True">
+                                                <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                                            </form>
+                                            <form method="post" action="{% url 'update' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="student_id" value="{{ student.Sno }}">
+                                                <input type="hidden" name="table" value="student">
+                                                <input type="hidden" name="delete" value="True">
+                                                <button type="submit" class="btn btn-info btn-sm">修改</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5">No student found</td>
+                                </tr>
+                            {% endif %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+
+                </div>
+
+            {% elif table == 'course' %}
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                    查找要删除的记录
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'delete' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-3">
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text" id="inputGroup-sizing-default">用课程号搜索</span>
+                                        <input type="text" class="form-control" name="course" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d*" id="studentIdInput">
+                                        <input type="hidden" name="table" value="course">
+                                        <input type="hidden" name="delete" value="False">
+                                    </div>
+                                </div>
+                                <div class="col-1">
+                                  <button class="btn btn-primary" type="submit">搜索</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        查找结果
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+
+                                <tr>
+                                    <th>课程编号</th>
+                                    <th>课程名称</th>
+                                    <th>先修课程</th>
+                                    <th>学分</th>
+                                    <th>课时</th>
+                                    <th>操作</th>
+                                </tr>
+
+
+                            <tbody>
+
+                            {% if courses %}
+                                {% for course in courses %}
+                                    <tr>
+                                        <td>{{ course.Cno }}</td>
+                                        <td>{{ course.Cname }}</td>
+                                        <td>{{ course.get_cpno_name }}</td>
+                                        <td>{{ course.Ccredit }}</td>
+                                        <td>{{ course.Chours }} 课时</td>
+                                        <td>
+                                            <form method="post" action="{% url 'delete' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="course_id" value="{{ course.Cno }}">
+                                                <input type="hidden" name="table" value="course">
+                                                <input type="hidden" name="delete" value="True">
+                                                <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5">No course found</td>
+                                </tr>
+                            {% endif %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+
+                </div>
+
+            {% elif table == 'sc' %}
+                <div class="card mt-4">
+                    <div class="card-header">
+                    查找要删除的记录
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'delete' %}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text" id="inputGroup-sizing-default">输入学号</span>
+                                        <input type="text" class="form-control" name="student_id" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d*" id="studentIdInput">
+                                        <span class="input-group-text" id="inputGroup-sizing-default">输入课程</span>
+                                        <input type="text" class="form-control" name="course_id" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+                                        <input type="hidden" name="table" value="sc">
+                                        <input type="hidden" name="delete" value="False">
+                                    </div>
+                                </div>
+                                <div class="col-1">
+                                  <button class="btn btn-primary" type="submit">搜索</button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <i class="fas fa-table me-1"></i>
+                        查找结果
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+
+                                <tr>
+                                    <th>学号</th>
+                                    <th>姓名</th>
+                                    <th>课程</th>
+                                    <th>课程号</th>
+                                    <th>成绩</th>
+                                    <th>操作</th>
+                                </tr>
+
+
+                            <tbody>
+
+                            {% if scs %}
+                                {% for sc in scs %}
+                                    <tr>
+                                        <td>{{ sc.Sno }}</td>
+                                        <td>{{ sc.student.Sname }}</td>
+                                        <td>{{ sc.course.Cname }}</td>
+                                        <td>{{ sc.course.Cno }}</td>
+                                        <td>{{ sc.Grade }}</td>
+                                        <td>
+                                            <form method="post" action="{% url 'delete' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="student_id" value="{{ sc.Sno }}">
+                                                <input type="hidden" name="course_id" value="{{ sc.Cno }}">
+                                                <input type="hidden" name="table" value="student">
+                                                <input type="hidden" name="delete" value="True">
+                                                <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5">No sc record found</td>
+                                </tr>
+                            {% endif %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+
+                </div>
+
+            {% endif %}
+
+
+        </div>
+    </main>
+
+
+{% endblock %}
+
+
+
+
+{% block script %}
+    <style>
+        select.form-control {
+            -webkit-appearance: menulist;
+            -moz-appearance: menulist;
+        }
+    </style>
+{% endblock %}

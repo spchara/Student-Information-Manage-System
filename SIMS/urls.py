@@ -24,4 +24,7 @@ urlpatterns = [
     path('index/', views.index, name='index'),
     path('student_table/', views.student_table, name='student_table'),
     path('course_table/', views.course_table, name='course_table'),
+    path('sc_table/', views.sc_table, name='sc_table'),
+    path('delete', views.delete, name='delete'),
+    path('update', views.update, name='update'),
 ]
