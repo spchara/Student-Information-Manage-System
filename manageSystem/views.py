@@ -371,9 +371,7 @@ def insert(request):
         if status == 'I':
             message = 'Successfully insert.'
 
-
         return render(request, 'insert.html', {'message': message, 'table': table})
-
 
     if request.method == "POST":
         table = request.POST.get('table', '')
@@ -383,13 +381,14 @@ def insert(request):
             student_gender = request.POST.get('student_gender', '').strip()
             student_age = request.POST.get('student_age', '').strip()
             student_department = request.POST.get('student_department', '').strip()
-            print("id:"+student_id)
-            print("name:"+student_name)
-            print("gender:"+student_gender)
-            print("age:"+student_age)
-            print("department:"+student_department)
+            print("id:" + student_id)
+            print("name:" + student_name)
+            print("gender:" + student_gender)
+            print("age:" + student_age)
+            print("department:" + student_department)
             try:
-                models.Student.objects.create(Sno=student_id, Sname=student_name, Ssex=student_gender, Sage=int(student_age), Sdept=student_department)
+                models.Student.objects.create(Sno=student_id, Sname=student_name, Ssex=student_gender,
+                                              Sage=int(student_age), Sdept=student_department)
                 query_params = urlencode({'table': table, 'status': 'I'})
                 return HttpResponseRedirect(f"{reverse('insert')}?{query_params}")
 
@@ -397,16 +396,26 @@ def insert(request):
                 message = str(e)
 
         elif table == 'course':
-            course_id = request.POST.get('course_id', '').strip()
             course_name = request.POST.get('course_name', '').strip()
             course_hours = request.POST.get('course_hours', '').strip()
             course_credit = request.POST.get('course_credit', '').strip()
             pre_course_id = request.POST.get('pre_course_id', '').strip()
-            try:
-                models.Course.objects.create(Cno=course_id, Cname=course_name, Chours=int(course_hours), Ccredit=float(course_credit), Cpno=pre_course_id)
-                query_params = urlencode({'table': table, 'status': 'I'})
-                return HttpResponseRedirect(f"{reverse('insert')}?{query_params}")
-            except Exception as e:
-                message = str(e)
+            print("name:" + course_name)
+            print("hours:" + course_hours)
+            print("credit:" + course_credit)
+            print("pre_course_id:" + pre_course_id)
+            if (not pre_course_id.startswith('C') or not pre_course_id[1:].isdigit() or len(pre_course_id) != 4) and pre_course_id:
+                message = '先修课程编号不合法'
+            else:
+                try:
+                    total_courses = models.Course.objects.count()
+                    course_id = 'C' + f"{total_courses + 1:03}"
+                    print(course_id)
+                    models.Course.objects.create(Cno=course_id, Cname=course_name, Chours=int(course_hours),
+                                                 Ccredit=float(course_credit), Cpno=pre_course_id)
+                    query_params = urlencode({'table': table, 'status': 'I'})
+                    return HttpResponseRedirect(f"{reverse('insert')}?{query_params}")
+                except Exception as e:
+                    message = str(e)
 
     return render(request, 'insert.html', {'table': table, 'message': message})

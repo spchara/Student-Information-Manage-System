@@ -118,7 +118,7 @@
                         <tbody>
 
                             <tr>
-                                <form method="post" action="{% url 'update' %}">
+                                <form method="post" action="{% url 'insert' %}">
                                     {% csrf_token %}
                                     <td><input placeholder="课程名" name='course_name' aria-label="Sizing example input" class="form-control" type="text"> </td>
                                     <td><input placeholder="Cxxx四位编号" name='pre_course_id' aria-label="Sizing example input" class="form-control"  type="text"> </td>
@@ -154,7 +154,7 @@
                         <tbody>
 
                                 <tr>
-                                    <form method="post" action="{% url 'update' %}">
+                                    <form method="post" action="{% url 'insert' %}">
                                         {% csrf_token %}
                                         <td><input placeholder="11位学号"  name="new_student_id" aria-label="Sizing example input" class="form-control" type="text"></td>
                                         <td><input placeholder="Cxxx四位编号" name="new_course_id" aria-label="Sizing example input" class="form-control" type="text"></td>
