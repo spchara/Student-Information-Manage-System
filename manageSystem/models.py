@@ -1,7 +1,16 @@
 from django.db import models
 from django.db.models import F, Q, CheckConstraint
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import PROTECT, RESTRICT
+from django.conf import settings
 
+def get_on_delete_behavior():
+    if settings.ON_DELETE_BEHAVIOR == 'CASCADE':
+        return models.CASCADE
+    elif settings.ON_DELETE_BEHAVIOR == 'RESTRICT':
+        return models.RESTRICT
+    else:
+        raise ValueError("Invalid ON_DELETE_BEHAVIOR setting")
 
 class Course(models.Model):
     Cno = models.CharField(max_length=4, primary_key=True)
@@ -9,6 +18,8 @@ class Course(models.Model):
     Cpno = models.CharField(max_length=4, blank=True, null=True)
     Ccredit = models.DecimalField(max_digits=3, decimal_places=1, blank=True, null=True)
     Chours = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(99)], default=48)  # New field
+    Cpno_fk = models.ForeignKey('self', on_delete=get_on_delete_behavior(), blank=True, null=True,
+                                related_name='related_courses')
 
     class Meta:
         db_table = 'course'
@@ -66,8 +77,8 @@ class SC(models.Model):
     Cno = models.CharField(max_length=4)
     Grade = models.SmallIntegerField(blank=True, null=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
-    student = models.ForeignKey('Student', to_field='Sno', on_delete=models.CASCADE)
-    course = models.ForeignKey('Course', to_field='Cno', on_delete=models.CASCADE)
+    student = models.ForeignKey('Student', to_field='Sno', on_delete=get_on_delete_behavior())
+    course = models.ForeignKey('Course', to_field='Cno', on_delete=get_on_delete_behavior())
 
     class Meta:
         db_table = 'sc'

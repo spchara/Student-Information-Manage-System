@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+ON_DELETE_BEHAVIOR = 'CASCADE'
 # Application definition
 
 INSTALLED_APPS = [

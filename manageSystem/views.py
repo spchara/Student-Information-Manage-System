@@ -5,7 +5,25 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from urllib.parse import urlencode
 from django.http import HttpRequest
+from django.db import IntegrityError
 
+from django.conf import settings
+from django.http import HttpResponse
+
+
+def change_setting(request):
+    print("change_setting view called")  # 调试语句
+    if request.method == 'POST':
+        mode = request.POST.get('mode', '')
+        print("Mode:" + mode)
+        if mode == 'RESTRICT':
+            settings.ON_DELETE_BEHAVIOR = 'CASCADE'
+            query_params = urlencode({'mode': 'CASCADE', 'status': 'C'})
+        else:
+            settings.ON_DELETE_BEHAVIOR = 'RESTRICT'
+            query_params = urlencode({'mode': 'RESTRICT', 'status': 'C'})
+
+        return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
 
 # Create your views here.
 
@@ -14,6 +32,7 @@ def index(request):
 
 
 from django.core.paginator import Paginator
+
 
 def student_table(request):
     message = ''
@@ -220,17 +239,23 @@ def sc_table(request):
 
 
 def delete(request):
+    print(settings.ON_DELETE_BEHAVIOR)
     message = ''
     table = 'student'
+    mode = settings.ON_DELETE_BEHAVIOR
     if request.method == 'GET':
         table = request.GET.get('table', '')
         status = request.GET.get('status', '')
+        if request.GET.get('mode', '') != '':
+            mode = request.GET.get('mode', '')
         if status == 'F':
             message = 'Deleted successfully.'
         elif status == 'U':
             message = 'Updated successfully.'
-
-        return render(request, 'delete.html', {'message': message, 'table': table})
+        elif status == 'C':
+            message = 'Successfully change delete mode.'
+        print("mode:"+mode)
+        return render(request, 'delete.html', {'message': message, 'table': table, 'mode': mode})
 
     if request.method == 'POST':
         table = request.POST.get('table', '')
@@ -242,9 +267,12 @@ def delete(request):
                 if student.exists():
                     print("delete:" + d)
                     if d == "True":
-                        student.delete()
-                        query_params = urlencode({'table': table, 'status': 'F'})
-                        return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
+                        try:
+                            student.delete()
+                            query_params = urlencode({'table': table, 'status': 'F'})
+                            return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
+                        except IntegrityError:
+                            message = 'Cannot delete student because it is referenced by other records.'
                     else:
                         return render(request, 'delete.html', {'message': message, 'table': table, 'students': student})
 
@@ -263,9 +291,12 @@ def delete(request):
                     if d == "False":
                         return render(request, 'delete.html', {'message': message, 'table': table, 'courses': course})
                     else:
-                        course.delete()
-                        query_params = urlencode({'table': table, 'status': 'F'})
-                        return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
+                        try:
+                            course.delete()
+                            query_params = urlencode({'table': table, 'status': 'F'})
+                            return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
+                        except IntegrityError:
+                            message = 'Cannot delete course because it is referenced by other records.'
 
                 else:
                     message = f'No course found with ID: "{course_id}".'
@@ -281,16 +312,19 @@ def delete(request):
                     if d == "False":
                         return render(request, 'delete.html', {'message': message, 'table': table, 'scs': sc})
                     else:
-                        sc.delete()
-                        query_params = urlencode({'table': table, 'status': 'F'})
-                        return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
+                        try:
+                            sc.delete()
+                            query_params = urlencode({'table': table, 'status': 'F'})
+                            return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
+                        except IntegrityError:
+                            message = 'Cannot delete SC record because it is referenced by other records.'
 
                 else:
                     message = f'No sc record found with student ID: "{student_id}" and course ID: "{course_id}".'
             else:
                 message = 'Please enter student ID and course ID.'
 
-    return render(request, 'delete.html', {'message': message, 'table': table})
+    return render(request, 'delete.html', {'message': message, 'table': table,'mode':mode})
 
 
 def update(request):
@@ -334,7 +368,7 @@ def update(request):
                         course.Chours = int(request.POST.get('course_hours', ''))
                         course.Ccredit = float(request.POST.get('course_credit', '').strip())
                         course.Cpno = request.POST.get('pre_course_id', '').strip()
-
+                        course.Cpno_fk = models.Course.objects.filter(Cno=course.Cpno).first()
                         try:
                             course.full_clean()
                             course.save()
@@ -419,7 +453,7 @@ def insert(request):
                     course_id = 'C' + f"{total_courses + 1:03}"
                     print(course_id)
                     models.Course.objects.create(Cno=course_id, Cname=course_name, Chours=int(course_hours),
-                                                 Ccredit=float(course_credit), Cpno=pre_course_id)
+                                                 Ccredit=float(course_credit), Cpno=pre_course_id,Cpno_fk=models.Course.objects.filter(Cno=pre_course_id).first())
                     query_params = urlencode({'table': table, 'status': 'I'})
                     return HttpResponseRedirect(f"{reverse('insert')}?{query_params}")
                 except Exception as e:

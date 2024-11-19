@@ -21,7 +21,7 @@
                         </div>
                         <button type="submit" class="btn btn-primary mt-3">确认</button>
                     </form>
-                    <p>注意，本删除方法为级联删除</p>
+
                 </div>
             </div>
         </div>
@@ -52,9 +52,25 @@
                     {{ message }}
                 </div>
             {% endif %}
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#selectTableModal">
-                选择要操作的表
-            </button>
+            <div class="row">
+                <div class="col-2">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#selectTableModal">
+                        选择要操作的表
+                    </button>
+                </div>
+                <div class="col-4">
+                    <form id="change_setting" method="post" href="{% url 'change_setting' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">
+                            切换删除模式，当前为：{{ mode }}
+                        </button>
+                        <input value="all" name="{{ mode }}" type="hidden">
+                    </form>
+                </div>
+
+
+            </div>
+
 
 
 
