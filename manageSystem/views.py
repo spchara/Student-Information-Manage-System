@@ -4,6 +4,7 @@ from manageSystem import models
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from urllib.parse import urlencode
+from django.http import HttpRequest
 
 
 # Create your views here.
@@ -220,6 +221,8 @@ def delete(request):
         status = request.GET.get('status', '')
         if status == 'F':
             message = 'Student has been deleted successfully.'
+        elif status == 'U':
+            message = 'Student has been updated successfully.'
 
         return render(request, 'delete.html', {'message': message, 'table': table})
 
@@ -231,7 +234,7 @@ def delete(request):
             if student_id:
                 student = models.Student.objects.filter(Sno=student_id)
                 if student.exists():
-                    print("delete:"+d)
+                    print("delete:" + d)
                     if d == "True":
                         student.delete()
                         query_params = urlencode({'table': table, 'status': 'F'})
@@ -285,20 +288,36 @@ def delete(request):
 
 
 def update(request):
+    table = 'student'
     message = ''
     if request.method == "POST":
         table = request.POST.get('table', '')
         u = request.POST.get('update', '')
+        print('update:' + u)
         if table == 'student':
             student_id = request.POST.get('student_id', '').strip()
             if student_id:
                 student = models.Student.objects.filter(Sno=student_id)
                 if student.exists():
                     student = student.first()
-                    if u == "False":
-                        return render(request, 'update.html', {'table': table, 'student': student})
+
+                    if u == "True":
+                        student.Sname = request.POST.get('student_name', '').strip()
+                        student.Ssex = request.POST.get('student_gender', '').strip()
+                        student.Sage = request.POST.get('student_age', '').strip()
+                        student.Sdept = request.POST.get('student_department', '').strip()
+
+                        try:
+                            student.full_clean()
+                            student.save()
+                            query_params = urlencode({'table': table, 'status': 'U'})
+                            return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
+
+
+                        except Exception as e:
+                            message = str(e)
+
                     else:
-                        student_name = request.POST.get('student_name', '').strip()
+                        return render(request, 'update.html', {'table': table, 'student': student, 'message': message})
 
-
-    return None
+    return render(request, 'update.html', {'table': table, 'message': message})

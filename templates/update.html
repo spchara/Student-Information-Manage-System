@@ -49,30 +49,50 @@
 
                         <tbody>
 
-                        {% if students %}
+                        {% if student %}
 
                                 <tr>
-                                    <td>{{ student.Sno }}</td>
-                                    <td>{{ student.Sname }}</td>
-                                    <td>{{ student.Ssex }}</td>
-                                    <td>{{ student.Sage }}</td>
-                                    <td>{{ student.Sdept }}</td>
-                                    <td>
-                                        <form method="post" action="{% url 'delete' %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="student_id" value="{{ student.Sno }}">
-                                            <input type="hidden" name="table" value="student">
-                                            <input type="hidden" name="delete" value="True">
-                                            <button type="submit" class="btn btn-danger btn-sm">删除</button>
-                                        </form>
-                                        <form method="post" action="{% url 'update' %}">
-                                            {% csrf_token %}
+                                    <form method="post" action="{% url 'update' %}">
+                                        {% csrf_token %}
+                                        <td>
+                                            <input disabled name="new_student_id" aria-label="Sizing example input" class="form-control" value="{{ student.Sno }}" type="text" pattern="\d{11}" title="Please enter exactly 11 digits">
+                                        </td>
+                                        <td><input name='student_name' aria-label="Sizing example input" class="form-control" value="{{ student.Sname }}" type="text"> </td>
+                                        <td>
+                                            <select class="form-select" aria-label="Default select example" name="student_gender">
+                                                {% if student.Ssex == '男' %}
+                                                <option value="男" selected>男</option>
+                                                <option value="女">女</option>
+                                                {% else %}
+                                                <option value="男">男</option>
+                                                <option value="女" selected>女</option>
+                                                {% endif %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input aria-label="Sizing example input" name="student_age" class="form-control" value="{{ student.Sage }}" type="number" min="15" max="50" title="Please enter a number between 15 and 50">
+                                        </td>
+                                        <td>
+                                            <select class="form-select" aria-label="Default select example" name="student_department">
+                                                <option value="计算机科学与技术" {% if student.Sdept == "计算机科学与技术" %}selected{% endif %}>计算机科学与技术</option>
+                                                <option value="软件工程" {% if student.Sdept == "软件工程" %}selected{% endif %}>软件工程</option>
+                                                <option value="网络工程" {% if student.Sdept == "网络工程" %}selected{% endif %}>网络工程</option>
+                                                <option value="信息安全" {% if student.Sdept == "信息安全" %}selected{% endif %}>信息安全</option>
+                                                <option value="物联网工程" {% if student.Sdept == "物联网工程" %}selected{% endif %}>物联网工程</option>
+                                                <option value="数字媒体技术" {% if student.Sdept == "数字媒体技术" %}selected{% endif %}>数字媒体技术</option>
+                                                <option value="智能科学与技术" {% if student.Sdept == "智能科学与技术" %}selected{% endif %}>智能科学与技术</option>
+                                                <option value="数据科学与大数据技术" {% if student.Sdept == "数据科学与大数据技术" %}selected{% endif %}>数据科学与大数据技术</option>
+                                                <option value="网络空间安全" {% if student.Sdept == "网络空间安全" %}selected{% endif %}>网络空间安全</option>
+                                                <option value="保密技术" {% if student.Sdept == "保密技术" %}selected{% endif %}>保密技术</option>
+                                            </select>
+                                        </td>
+                                        <td>
                                             <input type="hidden" name="student_id" value="{{ student.Sno }}">
                                             <input type="hidden" name="table" value="student">
                                             <input type="hidden" name="update" value="True">
-                                            <button type="submit" class="btn btn-info btn-sm">修改</button>
-                                        </form>
-                                    </td>
+                                            <button type="submit" class="btn btn-info ">确认修改</button>
+                                        </td>
+                                    </form>
                                 </tr>
 
                         {% else %}
@@ -89,6 +109,11 @@
 
             </div>
         {% elif table == 'course' %}
+
+
+
+
+
 
         {% elif table == 'sc' %}
 
