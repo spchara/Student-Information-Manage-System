@@ -231,13 +231,14 @@ def delete(request):
             if student_id:
                 student = models.Student.objects.filter(Sno=student_id)
                 if student.exists():
-
-                    if d == "False":
-                        return render(request, 'delete.html', {'message': message, 'table': table, 'students': student})
-                    else:
+                    print("delete:"+d)
+                    if d == "True":
                         student.delete()
                         query_params = urlencode({'table': table, 'status': 'F'})
                         return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
+                    else:
+                        return render(request, 'delete.html', {'message': message, 'table': table, 'students': student})
+
 
                 else:
                     message = f'No student found with ID: "{student_id}".'
@@ -284,14 +285,20 @@ def delete(request):
 
 
 def update(request):
+    message = ''
     if request.method == "POST":
         table = request.POST.get('table', '')
+        u = request.POST.get('update', '')
         if table == 'student':
             student_id = request.POST.get('student_id', '').strip()
             if student_id:
                 student = models.Student.objects.filter(Sno=student_id)
                 if student.exists():
                     student = student.first()
+                    if u == "False":
+                        return render(request, 'update.html', {'table': table, 'student': student})
+                    else:
+                        student_name = request.POST.get('student_name', '').strip()
 
 
     return None

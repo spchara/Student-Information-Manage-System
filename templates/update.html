@@ -1,10 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% load static %}
+{% block title %}删除记录{% endblock %}
 
-</body>
-</html>
+{% block content %}
+    <main>
+        <div class="container-fluid px-4">
+            {% if table == "student" %}
+            <h1 class="mt-4">学生表</h1>
+            {% elif table == "course" %}
+            <h1 class="mt-4">课程表</h1>
+            {% elif table == "sc" %}
+            <h1 class="mt-4">成绩表</h1>
+            {% endif %}
+            <ol class="breadcrumb mb-4">
+                {% if table == "student" %}
+                <li class="breadcrumb-item active">student tables</li>
+                {% elif table == "course" %}
+                <li class="breadcrumb-item active">course tables</li>
+                {% elif table == "sc" %}
+                <li class="breadcrumb-item active">sc tables</li>
+                {% endif %}
+
+            </ol>
+            {% if message != '' %}
+                <div class="alert alert-dark" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+
+        {% if table == 'student' %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <i class="fas fa-table me-1"></i>
+                    查找结果
+                </div>
+                <div class="card-body">
+                    <table class="table">
+
+                            <tr>
+                                <th>学号</th>
+                                <th>姓名</th>
+                                <th>性别</th>
+                                <th>年龄</th>
+                                <th>专业</th>
+                                <th>操作</th>
+                            </tr>
+
+
+                        <tbody>
+
+                        {% if students %}
+
+                                <tr>
+                                    <td>{{ student.Sno }}</td>
+                                    <td>{{ student.Sname }}</td>
+                                    <td>{{ student.Ssex }}</td>
+                                    <td>{{ student.Sage }}</td>
+                                    <td>{{ student.Sdept }}</td>
+                                    <td>
+                                        <form method="post" action="{% url 'delete' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="student_id" value="{{ student.Sno }}">
+                                            <input type="hidden" name="table" value="student">
+                                            <input type="hidden" name="delete" value="True">
+                                            <button type="submit" class="btn btn-danger btn-sm">删除</button>
+                                        </form>
+                                        <form method="post" action="{% url 'update' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="student_id" value="{{ student.Sno }}">
+                                            <input type="hidden" name="table" value="student">
+                                            <input type="hidden" name="update" value="True">
+                                            <button type="submit" class="btn btn-info btn-sm">修改</button>
+                                        </form>
+                                    </td>
+                                </tr>
+
+                        {% else %}
+                            <tr>
+                                <td colspan="5">No student found</td>
+                            </tr>
+                        {% endif %}
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+
+            </div>
+        {% elif table == 'course' %}
+
+        {% elif table == 'sc' %}
+
+        {% endif %}
+
+
+        </div>
+    </main>
+
+
+
+
+{% endblock %}

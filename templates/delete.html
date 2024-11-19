@@ -72,7 +72,7 @@
                                         <span class="input-group-text" id="inputGroup-sizing-default">用学号搜索</span>
                                         <input type="text" class="form-control" name="student_id" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d*" id="studentIdInput">
                                         <input type="hidden" name="table" value="student">
-                                        <input type="hidden" name="delete" value="False">
+                                        <input type="hidden" name="update" value="False">
                                     </div>
                                 </div>
                                 <div class="col-1">
@@ -124,7 +124,7 @@
                                                 {% csrf_token %}
                                                 <input type="hidden" name="student_id" value="{{ student.Sno }}">
                                                 <input type="hidden" name="table" value="student">
-                                                <input type="hidden" name="delete" value="True">
+                                                <input type="hidden" name="update" value="True">
                                                 <button type="submit" class="btn btn-info btn-sm">修改</button>
                                             </form>
                                         </td>
