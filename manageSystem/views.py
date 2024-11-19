@@ -220,9 +220,9 @@ def delete(request):
         table = request.GET.get('table', '')
         status = request.GET.get('status', '')
         if status == 'F':
-            message = 'Student has been deleted successfully.'
+            message = 'Deleted successfully.'
         elif status == 'U':
-            message = 'Student has been updated successfully.'
+            message = 'Updated successfully.'
 
         return render(request, 'delete.html', {'message': message, 'table': table})
 
@@ -251,7 +251,7 @@ def delete(request):
         elif table == 'course':
             course_id = request.POST.get('course_id', '').strip()
             if course_id:
-                course = models.Student.objects.filter(Sno=course_id)
+                course = models.Course.objects.filter(Cno=course_id)
                 if course.exists():
 
                     if d == "False":
@@ -293,7 +293,6 @@ def update(request):
     if request.method == "POST":
         table = request.POST.get('table', '')
         u = request.POST.get('update', '')
-        print('update:' + u)
         if table == 'student':
             student_id = request.POST.get('student_id', '').strip()
             if student_id:
@@ -312,12 +311,102 @@ def update(request):
                             student.save()
                             query_params = urlencode({'table': table, 'status': 'U'})
                             return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
-
-
                         except Exception as e:
                             message = str(e)
 
                     else:
                         return render(request, 'update.html', {'table': table, 'student': student, 'message': message})
+        elif table == 'course':
+            course_id = request.POST.get('course_id', '')
+            if course_id:
+                course = models.Course.objects.filter(Cno=course_id)
+                if course.exists():
+                    course = course.first()
+                    if u == "True":
+
+                        course.Cname = request.POST.get('course_name', '').strip()
+                        course.Chours = int(request.POST.get('course_hours', ''))
+                        course.Ccredit = float(request.POST.get('course_credit', '').strip())
+                        course.Cpno = request.POST.get('pre_course_id', '').strip()
+
+                        try:
+                            course.full_clean()
+                            course.save()
+                            query_params = urlencode({'table': table, 'status': 'U'})
+                            return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
+                        except Exception as e:
+                            message = str(e)
+
+                    else:
+                        print(course)
+                        return render(request, 'update.html', {'table': table, 'course': course, 'message': message})
+        else:
+            student_id = request.POST.get('student_id', '').strip()
+            course_id = request.POST.get('course_id', '').strip()
+            if student_id and course_id:
+                sc = models.SC.objects.filter(Sno=student_id, Cno=course_id)
+                if sc.exists():
+                    sc = sc.first()
+                    if u == "True":
+                        sc.Grade = int(request.POST.get('new_grade', ''))
+                        try:
+                            sc.full_clean()
+                            sc.save()
+                            query_params = urlencode({'table': table, 'status': 'U'})
+                            return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
+                        except Exception as e:
+                            message = str(e)
+                    else:
+                        return render(request, 'update.html', {'table': table, 'sc': sc, 'message': message})
 
     return render(request, 'update.html', {'table': table, 'message': message})
+
+
+def insert(request):
+    table = 'student'
+    message = ''
+    if request.method == 'GET':
+        table = request.GET.get('table', '')
+        status = request.GET.get('status', '')
+        if status == 'I':
+            message = 'Successfully insert.'
+
+
+        return render(request, 'insert.html', {'message': message, 'table': table})
+
+
+    if request.method == "POST":
+        table = request.POST.get('table', '')
+        if table == 'student':
+            student_id = request.POST.get('student_id', '').strip()
+            student_name = request.POST.get('student_name', '').strip()
+            student_gender = request.POST.get('student_gender', '').strip()
+            student_age = request.POST.get('student_age', '').strip()
+            student_department = request.POST.get('student_department', '').strip()
+            print("id:"+student_id)
+            print("name:"+student_name)
+            print("gender:"+student_gender)
+            print("age:"+student_age)
+            print("department:"+student_department)
+            try:
+                models.Student.objects.create(Sno=student_id, Sname=student_name, Ssex=student_gender, Sage=int(student_age), Sdept=student_department)
+                query_params = urlencode({'table': table, 'status': 'I'})
+                return HttpResponseRedirect(f"{reverse('insert')}?{query_params}")
+
+            except Exception as e:
+                message = str(e)
+
+        elif table == 'course':
+            course_id = request.POST.get('course_id', '').strip()
+            course_name = request.POST.get('course_name', '').strip()
+            course_hours = request.POST.get('course_hours', '').strip()
+            course_credit = request.POST.get('course_credit', '').strip()
+            pre_course_id = request.POST.get('pre_course_id', '').strip()
+            try:
+                models.Course.objects.create(Cno=course_id, Cname=course_name, Chours=int(course_hours), Ccredit=float(course_credit), Cpno=pre_course_id)
+                query_params = urlencode({'table': table, 'status': 'I'})
+                return HttpResponseRedirect(f"{reverse('insert')}?{query_params}")
+            except Exception as e:
+                message = str(e)
+
+    return render(request, 'insert.html', {'table': table, 'message': message})

@@ -159,7 +159,7 @@
                                 <div class="col-3">
                                     <div class="input-group mb-3">
                                         <span class="input-group-text" id="inputGroup-sizing-default">用课程号搜索</span>
-                                        <input type="text" class="form-control" name="course" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" pattern="\d*" id="studentIdInput">
+                                        <input type="text" class="form-control" name="course_id" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" id="studentIdInput">
                                         <input type="hidden" name="table" value="course">
                                         <input type="hidden" name="delete" value="False">
                                     </div>
@@ -202,13 +202,22 @@
                                         <td>{{ course.Ccredit }}</td>
                                         <td>{{ course.Chours }} 课时</td>
                                         <td>
-                                            <form method="post" action="{% url 'delete' %}">
+                                            <div class="d-flex">
+                                                <form method="post" action="{% url 'delete' %}">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="course_id" value="{{ course.Cno }}">
                                                 <input type="hidden" name="table" value="course">
                                                 <input type="hidden" name="delete" value="True">
                                                 <button type="submit" class="btn btn-danger btn-sm">删除</button>
                                             </form>
+                                                <form method="post" action="{% url 'update' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="course_id" value="{{ course.Cno }}">
+                                                    <input type="hidden" name="table" value="course">
+                                                    <input type="hidden" name="update" value="False">
+                                                    <button type="submit" class="btn btn-info btn-sm">修改</button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -283,14 +292,24 @@
                                         <td>{{ sc.course.Cno }}</td>
                                         <td>{{ sc.Grade }}</td>
                                         <td>
-                                            <form method="post" action="{% url 'delete' %}">
+                                            <div class="d-flex">
+                                                <form method="post" action="{% url 'delete' %}">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="student_id" value="{{ sc.Sno }}">
                                                 <input type="hidden" name="course_id" value="{{ sc.Cno }}">
                                                 <input type="hidden" name="table" value="student">
                                                 <input type="hidden" name="delete" value="True">
                                                 <button type="submit" class="btn btn-danger btn-sm">删除</button>
-                                            </form>
+                                                </form>
+                                                <form method="post" action="{% url 'update' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="student_id" value="{{ sc.Sno }}">
+                                                    <input type="hidden" name="course_id" value="{{ sc.Cno }}">
+                                                    <input type="hidden" name="table" value="sc">
+                                                    <input type="hidden" name="update" value="False">
+                                                    <button type="submit" class="btn btn-info btn-sm">修改</button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}

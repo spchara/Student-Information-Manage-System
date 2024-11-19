@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}插入记录{% endblock %}
+
+{% block content %}
+    <main>
+        <div class="container-fluid px-4">
+            {% if table == "student" %}
+            <h1 class="mt-4">学生表</h1>
+            {% elif table == "course" %}
+            <h1 class="mt-4">课程表</h1>
+            {% elif table == "sc" %}
+            <h1 class="mt-4">成绩表</h1>
+            {% endif %}
+            <ol class="breadcrumb mb-4">
+                {% if table == "student" %}
+                <li class="breadcrumb-item active">student tables</li>
+                {% elif table == "course" %}
+                <li class="breadcrumb-item active">course tables</li>
+                {% elif table == "sc" %}
+                <li class="breadcrumb-item active">sc tables</li>
+                {% endif %}
+
+            </ol>
+            {% if message != '' %}
+                <div class="alert alert-dark" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <i class="fas fa-table me-1"></i>
+                    添加学生记录
+
+                </div>
+                <div class="card-body">
+                    <table class="table">
+
+                            <tr>
+                                <th>学号</th>
+                                <th>姓名</th>
+                                <th>性别</th>
+                                <th>年龄</th>
+                                <th>专业</th>
+                                <th>操作</th>
+                            </tr>
+
+
+                        <tbody>
+
+
+                            <tr>
+                                <form method="post" action="{% url 'insert' %}">
+                                    {% csrf_token %}
+                                    <td>
+                                        <input placeholder="11位学号" name="student_id" aria-label="Sizing example input" class="form-control" value="{{ student.Sno }}" type="text" pattern="\d{11}" title="Please enter exactly 11 digits">
+                                    </td>
+                                    <td><input placeholder="学生姓名" name='student_name' aria-label="Sizing example input" class="form-control" value="{{ student.Sname }}" type="text"> </td>
+                                    <td>
+                                        <select class="form-select" aria-label="Default select example" name="student_gender">
+                                            <option selected disabled value="">选择性别</option>
+                                            <option value="男" selected>男</option>
+                                            <option value="女">女</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input placeholder="15-50" aria-label="Sizing example input" name="student_age" class="form-control" value="{{ student.Sage }}" type="number" min="15" max="50" title="Please enter a number between 15 and 50">
+                                    </td>
+                                    <td>
+                                        <select class="form-select" aria-label="Default select example" name="student_department">
+                                            <option selected disabled value="">选择专业</option>
+                                            <option value="计算机科学与技术">计算机科学与技术</option>
+                                            <option value="软件工程">软件工程</option>
+                                            <option value="网络工程">网络工程</option>
+                                            <option value="信息安全">信息安全</option>
+                                            <option value="物联网工程">物联网工程</option>
+                                            <option value="数字媒体技术">数字媒体技术</option>
+                                            <option value="智能科学与技术">智能科学与技术</option>
+                                            <option value="数据科学与大数据技术">数据科学与大数据技术</option>
+                                            <option value="网络空间安全">网络空间安全</option>
+                                            <option value="保密技术">保密技术</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="hidden" name="table" value="student">
+                                        <button type="submit" class="btn btn-info ">确认添加</button>
+                                    </td>
+                                </form>
+                            </tr>
+
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <i class="fas fa-table me-1"></i>
+                    添加课程记录
+                </div>
+                <div class="card-body">
+                    <table class="table">
+
+                            <tr>
+                                <th>课程名称</th>
+                                <th>先修课程</th>
+                                <th>学分</th>
+                                <th>课时</th>
+                                <th>操作</th>
+                            </tr>
+
+
+                        <tbody>
+
+                            <tr>
+                                <form method="post" action="{% url 'update' %}">
+                                    {% csrf_token %}
+                                    <td><input placeholder="课程名" name='course_name' aria-label="Sizing example input" class="form-control" type="text"> </td>
+                                    <td><input placeholder="Cxxx四位编号" name='pre_course_id' aria-label="Sizing example input" class="form-control"  type="text"> </td>
+                                    <td><input placeholder="学分，0-10一位小数" name='course_credit' aria-label="Sizing example input" class="form-control"  type="text"> </td>
+                                    <td><input placeholder="学时，0-100整数" name='course_hours' aria-label="Sizing example input" class="form-control" type="text"> </td>
+                                    <td>
+                                    <input type="hidden" name="table" value="course">
+                                    <button type="submit" class="btn btn-info ">确认添加</button>
+                                    </td>
+                                </form>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+
+            </div>
+            <div class="card mt-4">
+                <div class="card-header">
+                    <i class="fas fa-table me-1"></i>
+                    添加成绩记录
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                        <th>学号</th>
+                        <th>课程号</th>
+                        <th>成绩</th>
+                        <th>操作</th>
+                        </tr>
+                        <tbody>
+
+                                <tr>
+                                    <form method="post" action="{% url 'update' %}">
+                                        {% csrf_token %}
+                                        <td><input placeholder="11位学号"  name="new_student_id" aria-label="Sizing example input" class="form-control" type="text"></td>
+                                        <td><input placeholder="Cxxx四位编号" name="new_course_id" aria-label="Sizing example input" class="form-control" type="text"></td>
+                                        <td><input placeholder="0-100整数" name="new_grade" aria-label="Sizing example input" class="form-control" value="{{ sc.Grade }}" type="text"></td>
+                                        <td>
+                                            <input type="hidden" name="table" value="sc">
+                                            <button type="submit" class="btn btn-info ">确认修改</button>
+                                        </td>
+                                    </form>
+                                </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+
+            </div>
+
+{#        {% if table == "student" %}#}
+{#            #}
+{#        {% elif table == "course" %}#}
+{##}
+{#        {% elif table == "sc" %}#}
+{##}
+{#        {% endif %}#}
+
+
+        </div>
+    </main>
+
+
+{% endblock %}

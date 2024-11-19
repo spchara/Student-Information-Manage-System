@@ -109,14 +109,115 @@
 
             </div>
         {% elif table == 'course' %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <i class="fas fa-table me-1"></i>
+                    查找结果
+                </div>
+                <div class="card-body">
+                    <table class="table">
 
+                            <tr>
+                                <th>课程编号</th>
+                                <th>课程名称</th>
+                                <th>先修课程</th>
+                                <th>学分</th>
+                                <th>课时</th>
+                                <th>操作</th>
+                            </tr>
+
+
+                        <tbody>
+
+                        {% if course %}
+
+                                <tr>
+                                    <form method="post" action="{% url 'update' %}">
+                                        {% csrf_token %}
+                                        <td>
+                                            <input disabled name="new_course_id" aria-label="Sizing example input" class="form-control" value="{{ course.Cno }}" type="text" pattern="\d{11}" title="Please enter exactly 11 digits">
+                                        </td>
+                                        <td><input name='course_name' aria-label="Sizing example input" class="form-control" value="{{ course.Cname }}" type="text"> </td>
+                                        <td><input name='pre_course_id' aria-label="Sizing example input" class="form-control" value="{{ course.Cpno }}" type="text"> </td>
+                                        <td><input name='course_credit' aria-label="Sizing example input" class="form-control" value="{{ course.Ccredit }}" type="text"> </td>
+                                        <td><input name='course_hours' aria-label="Sizing example input" class="form-control" value="{{ course.Chours }}" type="text"> </td>
+                                        <td>
+                                            <input type="hidden" name="course_id" value="{{ course.Cno }}">
+                                            <input type="hidden" name="table" value="course">
+                                            <input type="hidden" name="update" value="True">
+                                            <button type="submit" class="btn btn-info ">确认修改</button>
+                                        </td>
+                                    </form>
+                                </tr>
+
+                        {% else %}
+                            <tr>
+                                <td colspan="5">No course found</td>
+                            </tr>
+                        {% endif %}
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+
+            </div>
 
 
 
 
 
         {% elif table == 'sc' %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <i class="fas fa-table me-1"></i>
+                    查找结果
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>课程</th>
+                        <th>课程号</th>
+                        <th>成绩</th>
+                        <th>操作</th>
+                        </tr>
+                        <tbody>
 
+                        {% if sc %}
+                                <tr>
+                                    <form method="post" action="{% url 'update' %}">
+                                        {% csrf_token %}
+                                        <td><input disabled name="new_student_id" aria-label="Sizing example input" class="form-control" value="{{ sc.Sno }}" type="text"></td>
+                                        <td><input disabled name="new_student_name" aria-label="Sizing example input" class="form-control" value="{{ sc.student.Sname }}" type="text"></td>
+                                        <td><input disabled name="new_course_name" aria-label="Sizing example input" class="form-control" value="{{ sc.course.Cname }}" type="text"></td>
+                                        <td><input disabled name="new_course_id" aria-label="Sizing example input" class="form-control" value="{{ sc.Cno }}" type="text"></td>
+                                        <td><input name="new_grade" aria-label="Sizing example input" class="form-control" value="{{ sc.Grade }}" type="text"></td>
+                                        <td>
+                                            <input type="hidden" name="student_id" value="{{ sc.Sno }}">
+                                            <input type="hidden" name="course_id" value="{{ sc.Cno }}">
+                                            <input type="hidden" name="table" value="sc">
+                                            <input type="hidden" name="update" value="True">
+                                            <button type="submit" class="btn btn-info ">确认修改</button>
+                                        </td>
+                                    </form>
+                                </tr>
+
+                        {% else %}
+                            <tr>
+                                <td colspan="5">No sc record found</td>
+                            </tr>
+                        {% endif %}
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+
+            </div>
         {% endif %}
 
 

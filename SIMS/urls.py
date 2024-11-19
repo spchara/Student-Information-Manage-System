@@ -27,4 +27,5 @@ urlpatterns = [
     path('sc_table/', views.sc_table, name='sc_table'),
     path('delete', views.delete, name='delete'),
     path('update', views.update, name='update'),
+    path('insert', views.insert, name='insert'),
 ]
