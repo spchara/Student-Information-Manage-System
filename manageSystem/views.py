@@ -92,7 +92,7 @@ def student_table(request):
                 message += f'age <= "{age_max}".'
             message = message.rstrip(', ')
 
-    paginator = Paginator(students, 100)  # Show 10 students per page
+    paginator = Paginator(students, 100)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -369,13 +369,16 @@ def update(request):
                         course.Ccredit = float(request.POST.get('course_credit', '').strip())
                         course.Cpno = request.POST.get('pre_course_id', '').strip()
                         course.Cpno_fk = models.Course.objects.filter(Cno=course.Cpno).first()
-                        try:
-                            course.full_clean()
-                            course.save()
-                            query_params = urlencode({'table': table, 'status': 'U'})
-                            return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
-                        except Exception as e:
-                            message = str(e)
+                        if course.Cpno and not models.Course.objects.filter(Cno=course.Cpno).exists():
+                            message = 'Invalid pre-course ID.'
+                        else:
+                            try:
+                                course.full_clean()
+                                course.save()
+                                query_params = urlencode({'table': table, 'status': 'U'})
+                                return HttpResponseRedirect(f"{reverse('delete')}?{query_params}")
+                            except Exception as e:
+                                message = str(e)
 
                     else:
                         print(course)
@@ -444,7 +447,9 @@ def insert(request):
             print("hours:" + course_hours)
             print("credit:" + course_credit)
             print("pre_course_id:" + pre_course_id)
-            if (not pre_course_id.startswith('C') or not pre_course_id[1:].isdigit() or len(
+            if pre_course_id and not models.Course.objects.filter(Cno=pre_course_id).exists():
+                message = '先修课程编号不合法'
+            elif (not pre_course_id.startswith('C') or not pre_course_id[1:].isdigit() or len(
                     pre_course_id) != 4) and pre_course_id:
                 message = '先修课程编号不合法'
             else:
